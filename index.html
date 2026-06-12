@@ -1,457 +1,609 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>FitnessHub Pro - Sistem Manajemen Gym Lengkap</title>
-    <!-- Font Awesome 6, Google Fonts, Chart.js, QRCode, html2pdf -->
+    <title>GymFit Pro - Sistem Manajemen Gym & Fitness</title>
+    <!-- Font Awesome & Google Fonts & Chart.js -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
-        body { transition: background 0.3s, color 0.3s; }
-        body.light { background: #f4f7fc; color: #1e2a3a; }
-        body.dark { background: #0a0f16; color: #eef2ff; }
-        .app-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
-        .card { background: rgba(255,255,255,0.1); backdrop-filter: blur(12px); border-radius: 28px; padding: 1.5rem; border: 1px solid rgba(255,255,255,0.15); transition: all 0.2s; }
-        .dark .card { background: rgba(18, 25, 35, 0.8); border-color: rgba(250,204,21,0.2); }
-        .light .card { background: white; box-shadow: 0 8px 20px rgba(0,0,0,0.05); border: none; }
-        .btn { padding: 10px 24px; border-radius: 40px; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; }
-        .btn-primary { background: #facc15; color: #0a0c10; }
-        .btn-outline { background: transparent; border: 1px solid #facc15; color: #facc15; }
-        .btn-danger { background: #dc2626; color: white; }
-        .grid-2, .grid-3 { display: grid; gap: 1.5rem; }
-        .grid-2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-        .grid-3 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-        .navbar { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem; }
-        .logo { font-size: 1.8rem; font-weight: 800; background: linear-gradient(135deg, #facc15, #ff8c00); -webkit-background-clip: text; background-clip: text; color: transparent; }
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 2rem; }
-        .stat-card { text-align: center; padding: 1rem; border-radius: 20px; background: rgba(0,0,0,0.2); }
-        .stat-number { font-size: 1.8rem; font-weight: 800; color: #facc15; }
-        input, select, textarea { width: 100%; padding: 12px 16px; border-radius: 28px; border: 1px solid #ccc; background: #f9f9f9; margin-top: 5px; }
-        .dark input, .dark select, .dark textarea { background: #1e2a36; border-color: #4b5563; color: white; }
-        .tab-bar { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 1.5rem; }
-        .tab { padding: 8px 20px; border-radius: 40px; cursor: pointer; background: #e2e8f0; }
-        .dark .tab { background: #1f2a36; }
-        .tab.active { background: #facc15; color: black; font-weight: bold; }
-        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 2rem; padding: 2rem; width: 90%; max-width: 500px; z-index: 1000; box-shadow: 0 25px 40px black; }
-        .dark .modal { background: #1a222c; border: 1px solid #facc15; }
-        .overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
-        .notification { position: fixed; bottom: 20px; right: 20px; background: #facc15; color: black; padding: 12px 20px; border-radius: 40px; z-index: 1100; animation: fadeOut 3s forwards; }
-        @keyframes fadeOut { 0% { opacity: 1; } 70% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
-        .chat-widget { position: fixed; bottom: 20px; right: 20px; width: 300px; background: #1f2a36; border-radius: 20px; z-index: 1050; display: none; flex-direction: column; }
-        .dark .chat-widget { background: #0f1720; border: 1px solid #facc15; }
-        .chat-header { background: #facc15; padding: 12px; border-radius: 20px 20px 0 0; cursor: pointer; color: black; font-weight: bold; }
-        .chat-body { height: 250px; overflow-y: auto; padding: 10px; }
-        .chat-input { display: flex; padding: 8px; gap: 8px; }
-        .chat-input input { flex: 1; margin: 0; }
-        @media (max-width: 750px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #0f1214;
+            color: #eef2f5;
+            padding: 20px;
+        }
+
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Navbar & auth */
+        .top-bar {
+            background: #1e2529;
+            border-radius: 28px;
+            padding: 16px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }
+        .logo h2 {
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff, #86efac);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        .logo span {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+        .auth-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #4b5563;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            color: white;
+            font-weight: 500;
+        }
+        .btn-primary {
+            background: #22c55e;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            color: #0a0c0e;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: white;
+        }
+        .card {
+            background: #1a1f24;
+            border-radius: 24px;
+            padding: 24px;
+            margin-bottom: 28px;
+            border: 1px solid #2d343a;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 24px;
+        }
+        .form-group {
+            margin-bottom: 18px;
+        }
+        label {
+            font-weight: 500;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+        input, select, textarea {
+            width: 100%;
+            padding: 12px 14px;
+            background: #0f1217;
+            border: 1px solid #2d3744;
+            border-radius: 20px;
+            color: white;
+            outline: none;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 12px 8px;
+            text-align: left;
+            border-bottom: 1px solid #2d3744;
+        }
+        .badge {
+            background: #22c55e20;
+            color: #86efac;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 12px;
+        }
+        .dashboard-stats {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 28px;
+        }
+        .stat-card {
+            background: #1e2529;
+            flex: 1;
+            min-width: 160px;
+            border-radius: 24px;
+            padding: 20px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 32px;
+            font-weight: 800;
+            color: #22c55e;
+        }
+        .hidden {
+            display: none;
+        }
+        .active-link {
+            background: #22c55e20;
+            border-left: 3px solid #22c55e;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+        }
+        .nav-btn {
+            background: #2d343a;
+            padding: 8px 18px;
+            border-radius: 40px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .nav-btn.active {
+            background: #22c55e;
+            color: #0f1214;
+            font-weight: bold;
+        }
+        @media (max-width: 700px) {
+            .top-bar { flex-direction: column; align-items: stretch; }
+        }
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            color: #6c757d;
+        }
+        button {
+            cursor: pointer;
+        }
+        .member-dashboard {
+            background: #13181c;
+        }
     </style>
 </head>
 <body>
-<div class="app-container" id="app">
-    <div class="navbar">
-        <div class="logo"><i class="fas fa-dumbbell"></i> FitnessHub Pro</div>
-        <div style="display: flex; gap: 12px;">
-            <button id="darkModeToggle" class="btn btn-outline"><i class="fas fa-moon"></i> Mode</button>
-            <div id="authButtons"></div>
+<div class="app-container" id="appRoot">
+    <!-- Top Bar & Auth -->
+    <div class="top-bar">
+        <div class="logo">
+            <h2><i class="fas fa-dumbbell"></i> GymFit Pro</h2>
+            <span>Manajemen Fitness & Gym</span>
+        </div>
+        <div id="authSection" class="auth-buttons">
+            <!-- dynamic login/register or user info -->
         </div>
     </div>
+
+    <!-- Main Content -->
     <div id="mainContent"></div>
+    <footer>© 2025 GymFit Pro - Sistem Manajemen Gym Terintegrasi</footer>
 </div>
-<div id="chatWidget" class="chat-widget">
-    <div class="chat-header" id="chatHeader"><i class="fas fa-comment-dots"></i> Chat dengan Admin</div>
-    <div class="chat-body" id="chatBody"></div>
-    <div class="chat-input"><input type="text" id="chatMessage" placeholder="Tulis pesan..."><button id="sendChatBtn" class="btn btn-primary">Kirim</button></div>
-</div>
+
 <script>
-    // ======================= DATA STORE (localStorage) =======================
+    // ---------- MOCK DATA (localStorage) ----------
     let gymData = {
-        users: [
-            { id: 1, username: "admin", password: "admin123", role: "admin", name: "Admin Fitness", email: "admin@fitnesshub.com", phone: "08123456789", status: "active", memberSince: "2024-01-01", membership: null, expireDate: null, weightHistory: [], workoutProgress: [] },
-            { id: 2, username: "member1", password: "member123", role: "member", name: "Budi Santoso", email: "budi@mail.com", phone: "085111222333", status: "active", memberSince: "2025-01-10", membership: "bulanan", expireDate: "2025-07-25", weightHistory: [{date:"2025-06-01", weight:78}], workoutProgress: [] }
-        ],
-        packages: [
-            { id: "harian", name: "Harian", price: 50000, durationDays: 1, benefits: "Akses 1 hari" },
-            { id: "mingguan", name: "Mingguan", price: 250000, durationDays: 7, benefits: "Akses 7 hari" },
-            { id: "bulanan", name: "Bulanan", price: 350000, durationDays: 30, benefits: "Akses 30 hari + 1 free kelas" },
-            { id: "tahunan", name: "Tahunan", price: 3200000, durationDays: 365, benefits: "Akses 365 hari + 12 free kelas + Free personal training" }
+        users: [   // { id, username, password, role (admin/member), name, email, phone, membership, expireDate, status }
+            { id: 1, username: "admin", password: "admin123", role: "admin", name: "Super Admin", email: "admin@gymfit.com", phone: "08123456789", membership: null, expireDate: null, status: "active" },
+            { id: 2, username: "member1", password: "member123", role: "member", name: "Budi Santoso", email: "budi@mail.com", phone: "085123456", membership: "bulanan", expireDate: "2025-06-15", status: "active" }
         ],
         trainers: [
-            { id: 1, name: "Michael Chang", specialization: "Bodybuilding & Strength", schedule: "Sen/Rab/Jum 08-12", phone: "0812-8888-123", rating: 4.8, reviews: [] },
-            { id: 2, name: "Sarah Fitriani", specialization: "Yoga, Pilates", schedule: "Sel/Kam 16-19", phone: "0852-9999-567", rating: 4.9, reviews: [] },
-            { id: 3, name: "Rudi Hermawan", specialization: "HIIT, Cardio", schedule: "Sen-Jum 18-20", phone: "0821-7777-432", rating: 4.7, reviews: [] }
+            { id: 1, name: "Andi Fitra", expertise: "Bodybuilding", schedule: "Senin, Rabu 10-12", phone: "081234567" },
+            { id: 2, name: "Siti Zubaidah", expertise: "Yoga & Pilates", schedule: "Selasa, Kamis 15-17", phone: "081987654" }
         ],
-        classes: [
-            { id: 1, name: "Body Pump", trainerId: 1, day: "Senin", time: "08:00", capacity: 15, booked: [2], waitingList: [] },
-            { id: 2, name: "Yoga Flow", trainerId: 2, day: "Selasa", time: "16:00", capacity: 12, booked: [], waitingList: [] },
-            { id: 3, name: "HIIT Extreme", trainerId: 3, day: "Rabu", time: "19:00", capacity: 20, booked: [], waitingList: [] },
-            { id: 4, name: "Zumba", trainerId: 3, day: "Kamis", time: "18:00", capacity: 18, booked: [], waitingList: [] }
+        jadwalLatihan: [
+            { id: 1, day: "Senin", time: "08:00 - 10:00", class: "Cardio Blast", trainer: "Andi Fitra" },
+            { id: 2, day: "Selasa", time: "16:00 - 18:00", class: "Yoga Flow", trainer: "Siti Zubaidah" },
+            { id: 3, day: "Rabu", time: "19:00 - 21:00", class: "Strength Training", trainer: "Andi Fitra" },
+            { id: 4, day: "Kamis", time: "10:00 - 12:00", class: "Zumba", trainer: "Rudi Hermawan" },
+            { id: 5, day: "Jumat", time: "14:00 - 16:00", class: "HIIT", trainer: "Cahyo" },
+            { id: 6, day: "Sabtu", time: "09:00 - 11:00", class: "Full Body", trainer: "Andi Fitra" }
         ],
-        payments: [
-            { id: 1, userId: 2, amount: 350000, packageId: "bulanan", date: "2025-06-10", method: "qris", status: "success", invoiceNo: "INV-001" }
+        membershipPackages: [
+            { id: "bulanan", name: "Bulanan", price: 350000, durationDays: 30 },
+            { id: "3bulan", name: "3 Bulan", price: 900000, durationDays: 90 },
+            { id: "tahunan", name: "Tahunan", price: 3200000, durationDays: 365 }
         ],
-        attendances: [
-            { id: 1, userId: 2, date: "2025-06-15", checkinTime: "09:30", method: "qrcode" }
+        payments: [ // { id, userId, amount, packageId, date, status }
+            { id: 1, userId: 2, amount: 350000, packageId: "bulanan", date: "2025-05-15", status: "lunas" }
         ],
-        bookings: [
-            { id: 1, userId: 2, classId: 1, date: "2025-06-17", status: "confirmed" }
-        ],
-        personalTrainerBookings: [
-            { id: 1, userId: 2, trainerId: 1, sessionDate: "2025-06-20", time: "10:00", status: "pending" }
-        ],
-        promotions: [
-            { code: "NEWYEAR10", discount: 10, validUntil: "2025-12-31" }
-        ],
-        gallery: [
-            "https://images.pexels.com/photos/416245/pexels-photo-416245.jpeg", "https://images.pexels.com/photos/260447/pexels-photo-260447.jpeg"
-        ],
-        gymAnnouncements: ["Promo Akhir Tahun: Diskon 20% membership tahunan!", "Jadwal kelas baru untuk Zumba setiap Kamis jam 18:00"],
-        chatMessages: []
+        attendances: [ // { id, userId, date, checkinTime }
+            { id: 1, userId: 2, date: "2025-06-10", checkinTime: "09:30" },
+            { id: 2, userId: 2, date: "2025-06-12", checkinTime: "17:45" }
+        ]
     };
-    let currentUser = null;
-    let darkMode = localStorage.getItem("darkMode") === "true";
 
-    // Helper functions
-    function saveData() { localStorage.setItem("fitnesshub_data", JSON.stringify(gymData)); }
-    function loadData() { let d = localStorage.getItem("fitnesshub_data"); if(d) gymData = JSON.parse(d); else saveData(); }
-    loadData();
+    let currentUser = null; // { id, username, role, name }
 
-    function showNotification(msg) { let n = document.createElement("div"); n.className = "notification"; n.innerText = msg; document.body.appendChild(n); setTimeout(()=>n.remove(), 3000); }
+    // Helper localStorage
+    function saveToLocal() {
+        localStorage.setItem("gymfit_data", JSON.stringify(gymData));
+    }
 
-    // ======================= AUTHENTICATION FIX =======================
+    function loadFromLocal() {
+        const stored = localStorage.getItem("gymfit_data");
+        if(stored) {
+            gymData = JSON.parse(stored);
+        } else {
+            saveToLocal();
+        }
+    }
+
+    // Tambah user baru (register)
     function registerMember(username, password, name, email, phone) {
-        if (gymData.users.find(u => u.username === username)) return false;
-        const newId = Date.now();
+        const exists = gymData.users.find(u => u.username === username);
+        if(exists) return false;
+        const newId = gymData.users.length + 1;
         gymData.users.push({
-            id: newId, username, password, role: "member", name, email, phone, status: "active",
-            memberSince: new Date().toISOString().slice(0,10), membership: null, expireDate: null,
-            weightHistory: [], workoutProgress: []
+            id: newId, username, password, role: "member", name, email, phone,
+            membership: null, expireDate: null, status: "active"
         });
-        saveData();
+        saveToLocal();
         return true;
     }
 
+    // Auth
     function login(username, password) {
         const user = gymData.users.find(u => u.username === username && u.password === password);
-        if (user) {
+        if(user) {
             currentUser = { id: user.id, username: user.username, role: user.role, name: user.name };
             return true;
         }
         return false;
     }
-
     function logout() { currentUser = null; renderApp(); }
 
-    // ======================= MODAL SYSTEM (FIXED) =======================
-    let currentModal = null, currentOverlay = null;
-    function showModal(modalElement, onConfirmCallback) {
-        if (currentModal) closeModal();
-        const overlay = document.createElement("div"); overlay.className = "overlay";
-        document.body.appendChild(overlay);
-        document.body.appendChild(modalElement);
-        currentModal = modalElement;
-        currentOverlay = overlay;
-
-        const confirmBtn = modalElement.querySelector("#modalConfirmBtn");
-        const cancelBtn = modalElement.querySelector("#modalCancelBtn");
-        if (confirmBtn) {
-            confirmBtn.onclick = () => {
-                if (onConfirmCallback) onConfirmCallback();
-                closeModal();
-            };
-        }
-        if (cancelBtn) cancelBtn.onclick = () => closeModal();
-    }
-    function closeModal() {
-        if (currentModal) currentModal.remove();
-        if (currentOverlay) currentOverlay.remove();
-        currentModal = null; currentOverlay = null;
-    }
-
-    function showLoginModal() {
-        const modalDiv = document.createElement("div"); modalDiv.className = "modal";
-        modalDiv.innerHTML = `<h3>Login</h3>
-            <input id="loginUser" placeholder="Username" autocomplete="off">
-            <input id="loginPass" type="password" placeholder="Password">
-            <div style="margin-top:20px;"><button id="modalConfirmBtn" class="btn btn-primary">Masuk</button><button id="modalCancelBtn" class="btn btn-outline">Batal</button></div>`;
-        showModal(modalDiv, () => {
-            const uname = document.getElementById("loginUser").value;
-            const pwd = document.getElementById("loginPass").value;
-            if (login(uname, pwd)) {
-                closeModal();
-                renderApp();
-                showNotification(`Selamat datang, ${currentUser.name}`);
-            } else {
-                alert("Username atau password salah!");
-            }
-        });
-    }
-
-    function showRegisterModal() {
-        const modalDiv = document.createElement("div"); modalDiv.className = "modal";
-        modalDiv.innerHTML = `<h3>Daftar Member Baru</h3>
-            <input id="regName" placeholder="Nama Lengkap">
-            <input id="regUser" placeholder="Username">
-            <input id="regPass" type="password" placeholder="Password">
-            <input id="regEmail" placeholder="Email">
-            <input id="regPhone" placeholder="Telepon">
-            <div style="margin-top:20px;"><button id="modalConfirmBtn" class="btn btn-primary">Daftar</button><button id="modalCancelBtn" class="btn btn-outline">Batal</button></div>`;
-        showModal(modalDiv, () => {
-            const name = document.getElementById("regName").value.trim();
-            const user = document.getElementById("regUser").value.trim();
-            const pass = document.getElementById("regPass").value.trim();
-            const email = document.getElementById("regEmail").value.trim();
-            const phone = document.getElementById("regPhone").value.trim();
-            if (!name || !user || !pass) { alert("Lengkapi semua data!"); return; }
-            if (registerMember(user, pass, name, email, phone)) {
-                alert("Pendaftaran berhasil! Silakan login.");
-                closeModal();
-            } else {
-                alert("Username sudah terdaftar!");
-            }
-        });
-    }
-
-    // ======================= RENDER UTAMA =======================
+    // Render utama
     function renderApp() {
-        document.body.classList.toggle("dark", darkMode);
-        document.body.classList.toggle("light", !darkMode);
-        const authDiv = document.getElementById("authButtons");
+        const authDiv = document.getElementById("authSection");
         const mainDiv = document.getElementById("mainContent");
-        if (!currentUser) {
-            authDiv.innerHTML = `<button class="btn btn-outline" id="loginBtn">Login</button>
-                                 <button class="btn btn-primary" id="registerBtn">Daftar Member</button>`;
-            mainDiv.innerHTML = renderLandingPage();
-            document.getElementById("loginBtn")?.addEventListener("click", showLoginModal);
-            document.getElementById("registerBtn")?.addEventListener("click", showRegisterModal);
-            document.getElementById("heroReg")?.addEventListener("click", showRegisterModal);
+        if(!currentUser) {
+            authDiv.innerHTML = `<button class="btn-outline" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> Login</button>
+                                 <button class="btn-primary" id="showRegisterBtn"><i class="fas fa-user-plus"></i> Daftar Member</button>`;
+            mainDiv.innerHTML = renderPublicPage();
+            document.getElementById("showLoginBtn")?.addEventListener("click", () => showLoginModal());
+            document.getElementById("showRegisterBtn")?.addEventListener("click", () => showRegisterModal());
         } else {
-            authDiv.innerHTML = `<span class="btn-outline" style="padding:8px 16px;"><i class="fas fa-user"></i> ${currentUser.name}</span>
-                                 <button class="btn btn-outline" id="logoutBtn">Logout</button>`;
+            // tampilan sesuai role
+            authDiv.innerHTML = `<span style="background:#2d3744; padding:6px 14px; border-radius:40px;"><i class="fas fa-user-circle"></i> ${currentUser.name} (${currentUser.role})</span>
+                                 <button class="btn-outline" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>`;
             document.getElementById("logoutBtn")?.addEventListener("click", logout);
-            if (currentUser.role === "admin") mainDiv.innerHTML = renderAdminDashboard();
-            else mainDiv.innerHTML = renderMemberDashboard();
-            attachAdminEvents(); attachMemberEvents();
-        }
-        initChatWidget();
-    }
-
-    function renderLandingPage() {
-        return `<div style="text-align:center;">
-            <h1>Selamat Datang di FitnessHub Pro</h1>
-            <p>Sistem manajemen gym terlengkap dengan pembayaran online, booking kelas, QR check-in, personal trainer, dan analitik.</p>
-            <div class="stats-grid">
-                <div class="stat-card"><i class="fas fa-users"></i><div class="stat-number">150+</div>Member Aktif</div>
-                <div class="stat-card"><i class="fas fa-chalkboard-user"></i><div class="stat-number">3+</div>Trainer Pro</div>
-                <div class="stat-card"><i class="fas fa-credit-card"></i><div class="stat-number">QRIS/Cash</div>Pembayaran</div>
-            </div>
-            <button class="btn btn-primary" id="heroReg">Daftar Sekarang</button>
-        </div>`;
-    }
-
-    // ======================= MEMBER DASHBOARD (ringkasan) =======================
-    function renderMemberDashboard() {
-        const member = gymData.users.find(u=>u.id===currentUser.id);
-        const remainingDays = member.expireDate ? Math.max(0, Math.ceil((new Date(member.expireDate)-new Date())/(1000*3600*24))) : 0;
-        const totalAttendance = gymData.attendances.filter(a=>a.userId===member.id).length;
-        const myBookings = gymData.bookings.filter(b=>b.userId===member.id);
-        const myClasses = myBookings.map(b=> gymData.classes.find(c=>c.id===b.classId)).filter(c=>c);
-        const myPayments = gymData.payments.filter(p=>p.userId===member.id);
-        const ptBookings = gymData.personalTrainerBookings.filter(p=>p.userId===member.id);
-        return `
-        <div class="grid-2">
-            <div class="card"><h3><i class="fas fa-id-card"></i> Profil Saya</h3><p><strong>Nama:</strong> ${member.name}<br><strong>Email:</strong> ${member.email}<br><strong>Telepon:</strong> ${member.phone}<br><strong>Bergabung:</strong> ${member.memberSince}</p><button id="editProfileBtn" class="btn-outline">Edit Profil</button></div>
-            <div class="card"><h3><i class="fas fa-calendar-alt"></i> Status Membership</h3><p>Paket: ${member.membership || 'Tidak aktif'}<br>Sisa masa aktif: ${remainingDays} hari<br>Status: ${member.status === 'active' ? '✅ Aktif' : '❌ Nonaktif'}</p><button id="extendMembershipBtn" class="btn btn-primary">Perpanjang / Upgrade Membership</button></div>
-            <div class="card"><h3><i class="fas fa-chart-line"></i> Statistik</h3><p>Total Kunjungan: ${totalAttendance}<br>Kelas Terbooking: ${myBookings.length}<br>Personal Training: ${ptBookings.length}</p><canvas id="weightChart" height="150"></canvas></div>
-        </div>
-        <div class="grid-2">
-            <div class="card"><h3><i class="fas fa-dumbbell"></i> Booking Kelas</h3><div id="classListContainer">${renderClassBookingList()}</div><button id="bookClassBtn" class="btn-primary" style="margin-top:10px;">+ Booking Kelas</button></div>
-            <div class="card"><h3><i class="fas fa-qrcode"></i> Check-in QR Code</h3><div id="memberQRCode"></div><button id="checkinQRBtn" class="btn btn-primary">Check-in Sekarang (QR)</button><p style="font-size:12px;">Scan QR di depan resepsionis</p></div>
-        </div>
-        <div class="grid-2">
-            <div class="card"><h3><i class="fas fa-walking"></i> Program Latihan & Tracking</h3><input type="number" id="weightInput" placeholder="Berat badan (kg)"><button id="updateWeightBtn" class="btn-primary">Update Berat</button></div>
-            <div class="card"><h3><i class="fas fa-calendar-check"></i> Jadwal Kelas Saya</h3><ul>${myClasses.map(c=>`<li>${c.name} - ${c.day} ${c.time} (Trainer: ${gymData.trainers.find(t=>t.id===c.trainerId)?.name})</li>`).join('')||'<li>Belum booking kelas</li>'}</ul></div>
-        </div>
-        <div class="card"><h3><i class="fas fa-credit-card"></i> Riwayat Pembayaran & Invoice</h3>${renderPaymentHistory(myPayments)}</div>
-        <div class="card"><h3><i class="fas fa-chalkboard-user"></i> Booking Personal Trainer</h3><select id="trainerSelect">${gymData.trainers.map(t=>`<option value="${t.id}">${t.name} - ${t.specialization}</option>`).join('')}</select><input type="date" id="ptDate"><button id="bookPTBtn" class="btn-primary">Booking Sesi</button><div id="ptList">${ptBookings.map(p=>{let t=gymData.trainers.find(tr=>tr.id===p.trainerId); return `<div>${t?.name} - ${p.sessionDate} ${p.time} (${p.status})</div>`;}).join('')}</div></div>
-        <div class="card"><h3><i class="fas fa-star"></i> Rating & Ulasan Trainer</h3>${gymData.trainers.map(t=>`<div><strong>${t.name}</strong> (⭐ ${t.rating}) <button class="rateTrainerBtn" data-id="${t.id}" style="padding:4px 12px;">Beri Rating</button><div id="reviews-${t.id}">${t.reviews?.map(r=>`<small>${r.user}: ${r.rating}⭐ - ${r.comment}</small><br>`).join('')||''}</div></div>`).join('')}</div>
-        <div class="card"><h3><i class="fas fa-image"></i> Galeri Gym</h3><div style="display:flex; gap:10px; flex-wrap:wrap;">${gymData.gallery.map(img=>`<img src="${img}" width="100" height="80" style="object-fit:cover; border-radius:12px;">`).join('')}</div></div>
-        <div class="card"><h3><i class="fas fa-tags"></i> Promo & Voucher</h3>${gymData.promotions.map(p=>`<div>Kode: ${p.code} - Diskon ${p.discount}% (s/d ${p.validUntil})</div>`).join('')}</div>`;
-    }
-
-    function renderClassBookingList() {
-        return gymData.classes.map(c => {
-            let isBooked = c.booked.includes(currentUser.id);
-            let waiting = c.waitingList.includes(currentUser.id);
-            return `<div style="border-bottom:1px solid #ccc; padding:8px;"><b>${c.name}</b> (${c.day}, ${c.time}) - Kapasitas: ${c.booked.length}/${c.capacity} ${isBooked ? '✅ Terbooking' : waiting ? '⏳ Waiting list' : ''}<br>${!isBooked && !waiting ? `<button class="bookClassNow" data-id="${c.id}" style="margin-top:5px;">Booking</button>` : ''}</div>`;
-        }).join('');
-    }
-
-    function renderPaymentHistory(payments) {
-        return `<table style="width:100%"><thead><tr><th>Invoice</th><th>Tgl</th><th>Paket</th><th>Metode</th><th>Total</th><th>Aksi</th></tr></thead><tbody>${payments.map(p=>`<tr><td>${p.invoiceNo}</td><td>${p.date}</td><td>${p.packageId}</td><td>${p.method}</td><td>Rp ${p.amount.toLocaleString()}</td><td><button class="downloadInvoiceBtn" data-invoice="${p.invoiceNo}">PDF</button></td></tr>`).join('')}</tbody></table>`;
-    }
-
-    // Event Member
-    function attachMemberEvents() {
-        document.getElementById("extendMembershipBtn")?.addEventListener("click", showUpgradeModal);
-        document.getElementById("bookClassBtn")?.addEventListener("click", showClassBookingModal);
-        document.querySelectorAll(".bookClassNow").forEach(btn => btn.addEventListener("click", (e) => { let cid = parseInt(btn.dataset.id); bookClass(cid); }));
-        document.getElementById("checkinQRBtn")?.addEventListener("click", () => { generateMemberQR(); showNotification("Scan QR Code di depan resepsionis untuk check-in."); });
-        document.getElementById("updateWeightBtn")?.addEventListener("click", () => { let w = document.getElementById("weightInput").value; if(w){ let member = gymData.users.find(u=>u.id===currentUser.id); member.weightHistory.push({date:new Date().toISOString().slice(0,10), weight:parseFloat(w)}); saveData(); showNotification("Berat badan diperbarui"); renderApp(); } });
-        document.getElementById("bookPTBtn")?.addEventListener("click", () => { let tid = parseInt(document.getElementById("trainerSelect").value); let date = document.getElementById("ptDate").value; if(date){ gymData.personalTrainerBookings.push({id:Date.now(), userId:currentUser.id, trainerId:tid, sessionDate:date, time:"10:00", status:"pending"}); saveData(); showNotification("Booking personal trainer berhasil!"); renderApp(); } });
-        document.querySelectorAll(".rateTrainerBtn").forEach(btn => btn.addEventListener("click", (e) => { let tid = parseInt(btn.dataset.id); let rating = prompt("Rating 1-5:"); let comment = prompt("Komentar:"); let trainer = gymData.trainers.find(t=>t.id===tid); if(trainer && rating){ trainer.reviews = trainer.reviews || []; trainer.reviews.push({user:currentUser.name, rating:parseInt(rating), comment}); let avg = trainer.reviews.reduce((a,b)=>a+b.rating,0)/trainer.reviews.length; trainer.rating = Math.round(avg*10)/10; saveData(); renderApp(); } }));
-        document.querySelectorAll(".downloadInvoiceBtn").forEach(btn => btn.addEventListener("click", async(e) => { let inv = btn.dataset.invoice; let payment = gymData.payments.find(p=>p.invoiceNo===inv); if(payment) await generateInvoicePDF(payment); }));
-        generateMemberQR();
-        renderWeightChart();
-    }
-
-    async function generateInvoicePDF(payment){
-        let member = gymData.users.find(u=>u.id===payment.userId);
-        let html = `<div style="padding:20px; font-family:monospace;"><h2>FitnessHub Pro</h2><p>Invoice: ${payment.invoiceNo}</p><p>Member: ${member.name}</p><p>Paket: ${payment.packageId}</p><p>Jumlah: Rp ${payment.amount.toLocaleString()}</p><p>Metode: ${payment.method}</p><p>Tanggal: ${payment.date}</p><hr><p>Terima kasih telah berolahraga di FitnessHub!</p></div>`;
-        let el = document.createElement('div'); el.innerHTML=html; document.body.appendChild(el); await html2pdf().from(el).set({filename:`invoice_${payment.invoiceNo}.pdf`}).save(); el.remove();
-    }
-    function generateMemberQR(){ let qrDiv = document.getElementById("memberQRCode"); if(qrDiv){ qrDiv.innerHTML=""; new QRCode(qrDiv, {text: `MEMBER|${currentUser.id}|${currentUser.name}`, width:120, height:120}); } }
-    function renderWeightChart(){ let member = gymData.users.find(u=>u.id===currentUser.id); let ctx = document.getElementById("weightChart")?.getContext("2d"); if(ctx && member.weightHistory.length){ let labels = member.weightHistory.map(w=>w.date); let data = member.weightHistory.map(w=>w.weight); new Chart(ctx, {type:'line', data:{labels, datasets:[{label:'Berat (kg)', data, borderColor:'#facc15'}]}}); } }
-    async function bookClass(classId){
-        let cls = gymData.classes.find(c=>c.id===classId);
-        if(cls.booked.length >= cls.capacity){
-            if(!cls.waitingList.includes(currentUser.id)) cls.waitingList.push(currentUser.id);
-            showNotification("Kelas penuh, Anda masuk waiting list.");
-        } else {
-            cls.booked.push(currentUser.id);
-            gymData.bookings.push({id:Date.now(), userId:currentUser.id, classId, date:new Date().toISOString().slice(0,10), status:"confirmed"});
-            showNotification("Booking kelas berhasil!");
-        }
-        saveData(); renderApp();
-    }
-    function showClassBookingModal(){
-        let options = gymData.classes.map(c=>`<div><input type="radio" name="class" value="${c.id}"> ${c.name} (${c.day} ${c.time}) - Sisa: ${c.capacity-c.booked.length}</div>`).join('');
-        let modalDiv = document.createElement("div"); modalDiv.className = "modal";
-        modalDiv.innerHTML = `<h3>Booking Kelas</h3>${options}<div style="margin-top:20px;"><button id="modalConfirmBtn" class="btn btn-primary">Booking</button><button id="modalCancelBtn" class="btn btn-outline">Batal</button></div>`;
-        showModal(modalDiv, () => {
-            let selected = document.querySelector('input[name="class"]:checked')?.value;
-            if(selected) bookClass(parseInt(selected));
-        });
-    }
-    function showUpgradeModal(){
-        let pkgHtml = gymData.packages.map(p=>`<div><input type="radio" name="pkg" value="${p.id}"> ${p.name} - Rp ${p.price.toLocaleString()} (${p.benefits})</div>`).join('');
-        let modalDiv = document.createElement("div"); modalDiv.className = "modal";
-        modalDiv.innerHTML = `<h3>Pilih Paket Membership</h3>${pkgHtml}<label>Metode Bayar:</label><select id="payMethod"><option>qris</option><option>transfer</option><option>ewallet</option><option>kartu</option></select><div style="margin-top:20px;"><button id="modalConfirmBtn" class="btn btn-primary">Bayar</button><button id="modalCancelBtn" class="btn btn-outline">Batal</button></div>`;
-        showModal(modalDiv, () => {
-            let pkgId = document.querySelector('input[name="pkg"]:checked')?.value;
-            let method = document.getElementById("payMethod")?.value;
-            if(pkgId && method){
-                let pkg = gymData.packages.find(p=>p.id===pkgId);
-                let member = gymData.users.find(u=>u.id===currentUser.id);
-                let invoice = "INV-"+Date.now();
-                gymData.payments.push({id:Date.now(), userId:currentUser.id, amount:pkg.price, packageId:pkg.id, date:new Date().toISOString().slice(0,10), method, status:"success", invoiceNo:invoice});
-                member.membership = pkg.id;
-                let expire = new Date(); expire.setDate(expire.getDate()+pkg.durationDays);
-                member.expireDate = expire.toISOString().slice(0,10);
-                saveData();
-                showNotification(`Pembayaran ${method} berhasil! Invoice: ${invoice}`);
-                generateInvoicePDF({invoiceNo:invoice, userId:currentUser.id, amount:pkg.price, packageId:pkg.id, date:new Date().toISOString().slice(0,10), method});
-                renderApp();
+            if(currentUser.role === "admin") {
+                mainDiv.innerHTML = renderAdminDashboard();
+                attachAdminEvents();
+            } else {
+                mainDiv.innerHTML = renderMemberDashboard();
+                attachMemberEvents();
             }
-        });
+        }
     }
 
-    // ======================= ADMIN DASHBOARD (ringkasan) =======================
-    function renderAdminDashboard(){
-        let members = gymData.users.filter(u=>u.role==="member");
-        let activeMembers = members.filter(m=>m.status==="active").length;
-        let revenue = gymData.payments.reduce((s,p)=>s+p.amount,0);
-        let attendanceToday = gymData.attendances.filter(a=>a.date===new Date().toISOString().slice(0,10)).length;
-        return `<div class="stats-grid"><div class="stat-card"><div class="stat-number">${members.length}</div><div>Total Member</div></div><div class="stat-card"><div class="stat-number">${activeMembers}</div><div>Aktif</div></div><div class="stat-card"><div class="stat-number">Rp ${revenue.toLocaleString()}</div><div>Pendapatan</div></div><div class="stat-card"><div class="stat-number">${attendanceToday}</div><div>Absen Hari Ini</div></div></div>
-        <div class="grid-2"><div class="card"><canvas id="revenueChart"></canvas></div><div class="card"><canvas id="memberChart"></canvas></div></div>
-        <div class="tab-bar" id="adminTabs"><div class="tab active" data-tab="members">Member</div><div class="tab" data-tab="packages">Paket</div><div class="tab" data-tab="trainers">Trainer</div><div class="tab" data-tab="classes">Kelas</div><div class="tab" data-tab="payments">Pembayaran</div><div class="tab" data-tab="reports">Laporan</div><div class="tab" data-tab="gallery">Galeri</div></div>
-        <div id="adminTabContent" class="card"></div>`;
+    // Halaman public sebelum login
+    function renderPublicPage() {
+        return `<div class="card" style="text-align:center;">
+                    <h2><i class="fas fa-dumbbell"></i> Selamat Datang di GymFit Pro</h2>
+                    <p>Sistem manajemen gym modern dengan fitur lengkap: pendaftaran member, jadwal latihan, pembayaran, absensi, dan laporan.</p>
+                    <p style="margin-top:20px;">🔐 Demo: <strong>admin/admin123</strong> atau daftar member baru.</p>
+                    <div class="grid-2" style="margin-top:20px;">
+                        <div><i class="fas fa-chalkboard-user"></i> Pelatih Profesional</div>
+                        <div><i class="fas fa-calendar-week"></i> Jadwal Variatif</div>
+                        <div><i class="fas fa-credit-card"></i> Paket Membership</div>
+                        <div><i class="fas fa-chart-line"></i> Dashboard Statistik</div>
+                    </div>
+                </div>`;
     }
-    function attachAdminEvents(){
-        renderAdminCharts();
-        const tabs = document.querySelectorAll("#adminTabs .tab");
-        const content = document.getElementById("adminTabContent");
-        function loadTab(tab){
-            if(tab==="members") content.innerHTML = renderMemberManage();
-            if(tab==="packages") content.innerHTML = renderPackageManage();
-            if(tab==="trainers") content.innerHTML = renderTrainerManage();
-            if(tab==="classes") content.innerHTML = renderClassManage();
-            if(tab==="payments") content.innerHTML = renderPaymentManage();
-            if(tab==="reports") content.innerHTML = renderReports();
-            if(tab==="gallery") content.innerHTML = renderGalleryManage();
-            attachSubAdminEvents();
+
+    // ADMIN DASHBOARD (full feature)
+    function renderAdminDashboard() {
+        const memberCount = gymData.users.filter(u => u.role === "member").length;
+        const activeMembers = gymData.users.filter(u => u.role === "member" && u.status === "active").length;
+        const revenue = gymData.payments.reduce((sum, p) => sum + p.amount, 0);
+        const attendanceToday = gymData.attendances.filter(a => a.date === new Date().toISOString().slice(0,10)).length;
+        return `
+            <div class="dashboard-stats">
+                <div class="stat-card"><i class="fas fa-users"></i><div class="stat-number">${memberCount}</div><div>Total Member</div></div>
+                <div class="stat-card"><i class="fas fa-user-check"></i><div class="stat-number">${activeMembers}</div><div>Aktif</div></div>
+                <div class="stat-card"><i class="fas fa-money-bill-wave"></i><div class="stat-number">Rp ${revenue.toLocaleString()}</div><div>Pendapatan</div></div>
+                <div class="stat-card"><i class="fas fa-fingerprint"></i><div class="stat-number">${attendanceToday}</div><div>Absensi Hari Ini</div></div>
+            </div>
+            <div class="grid-2">
+                <div class="card"><h3><i class="fas fa-chart-pie"></i> Statistik Keanggotaan</h3><canvas id="membershipChart" width="400" height="200"></canvas></div>
+                <div class="card"><h3><i class="fas fa-chart-line"></i> Tren Pembayaran (Bulanan)</h3><canvas id="revenueChart" width="400" height="200"></canvas></div>
+            </div>
+            <div class="card"><h3><i class="fas fa-user-plus"></i> Manajemen Member & Pelatih</h3>
+                <div class="nav-menu" id="adminTabs">
+                    <div data-tab="members" class="nav-btn active">Daftar Member</div>
+                    <div data-tab="trainers" class="nav-btn">Pelatih</div>
+                    <div data-tab="schedule" class="nav-btn">Jadwal Latihan</div>
+                    <div data-tab="attendanceReport" class="nav-btn">Laporan Absensi</div>
+                    <div data-tab="paymentReport" class="nav-btn">Laporan Pembayaran</div>
+                </div>
+                <div id="adminTabContent"></div>
+            </div>`;
+    }
+
+    function attachAdminEvents() {
+        // render charts
+        renderMembershipChart();
+        renderRevenueChart();
+        // tab switching
+        const tabs = document.querySelectorAll("#adminTabs .nav-btn");
+        const contentDiv = document.getElementById("adminTabContent");
+        function loadTab(tabId) {
+            if(tabId === "members") contentDiv.innerHTML = renderMemberList();
+            if(tabId === "trainers") contentDiv.innerHTML = renderTrainerManagement();
+            if(tabId === "schedule") contentDiv.innerHTML = renderScheduleManagement();
+            if(tabId === "attendanceReport") contentDiv.innerHTML = renderAttendanceReport();
+            if(tabId === "paymentReport") contentDiv.innerHTML = renderPaymentReport();
+            attachSubEvents();
         }
-        tabs.forEach(t=>t.addEventListener("click",()=>{ tabs.forEach(tb=>tb.classList.remove("active")); t.classList.add("active"); loadTab(t.dataset.tab); }));
+        tabs.forEach(tab => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(t => t.classList.remove("active"));
+                tab.classList.add("active");
+                const tabId = tab.dataset.tab;
+                loadTab(tabId);
+            });
+        });
         loadTab("members");
     }
-    function renderMemberManage(){ let members=gymData.users.filter(u=>u.role==="member"); return `<button id="addMemberBtn" class="btn-primary">Tambah Member</button><br><br><table>${members.map(m=>`<tr><td>${m.name}</td><td>${m.email}</td><td>${m.membership||'-'}</td><td><button class="toggleStatus" data-id="${m.id}">${m.status==='active'?'Nonaktifkan':'Aktifkan'}</button></td></tr>`).join('')}</table>`; }
-    function renderPackageManage(){ return `<div id="pkgList">${gymData.packages.map(p=>`<div>${p.name} - Rp ${p.price} <button class="editPkg" data-id="${p.id}">Edit</button></div>`).join('')}</div><button id="addPkgBtn" class="btn-primary">Tambah Paket</button>`; }
-    function renderTrainerManage(){ return `<div>${gymData.trainers.map(t=>`<div><strong>${t.name}</strong> - ${t.specialization} - ${t.schedule} <button class="delTrainer" data-id="${t.id}" class="btn-danger">Hapus</button></div>`).join('')}</div><button id="addTrainerBtn" class="btn-primary">Tambah Trainer</button>`; }
-    function renderClassManage(){ return `<div>${gymData.classes.map(c=>`<div>${c.name} (${c.day} ${c.time}) Kapasitas:${c.capacity} <button class="editClass" data-id="${c.id}">Edit</button></div>`).join('')}</div><button id="addClassBtn" class="btn-primary">Tambah Kelas</button>`; }
-    function renderPaymentManage(){ return `<table>${gymData.payments.map(p=>{let u=gymData.users.find(u=>u.id===p.userId); return `<tr><td>${u?.name}</td><td>${p.invoiceNo}</td><td>Rp${p.amount}</td><td>${p.method}</td></tr>`;}).join('')}</table>`; }
-    function renderReports(){ return `<canvas id="reportChart" height="200"></canvas><div>Member Aktif: ${gymData.users.filter(u=>u.role==="member" && u.status==="active").length}</div><div>Pendapatan Bulanan: Rp ${gymData.payments.filter(p=>p.date.startsWith("2025-06")).reduce((s,p)=>s+p.amount,0).toLocaleString()}</div>`; }
-    function renderGalleryManage(){ return `<div><input type="url" id="newGalleryUrl" placeholder="URL Gambar"><button id="addGalleryBtn" class="btn-primary">Tambah</button><div id="galleryGrid" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;">${gymData.gallery.map(img=>`<div><img src="${img}" width="100"> <button class="delGallery" data-url="${img}">Hapus</button></div>`).join('')}</div></div>`; }
-    function attachSubAdminEvents(){
-        document.getElementById("addMemberBtn")?.addEventListener("click", showRegisterModal);
-        document.querySelectorAll(".toggleStatus").forEach(btn=>btn.addEventListener("click",(e)=>{ let id=parseInt(btn.dataset.id); let u=gymData.users.find(u=>u.id===id); if(u){ u.status = u.status==='active' ? 'inactive' : 'active'; saveData(); renderApp(); } }));
-        document.getElementById("addPkgBtn")?.addEventListener("click",()=>{ let name=prompt("Nama Paket"); let price=prompt("Harga"); if(name) gymData.packages.push({id:name.toLowerCase(), name, price:parseInt(price), durationDays:30, benefits:"Baru"}); saveData(); renderApp(); });
-        document.getElementById("addTrainerBtn")?.addEventListener("click",()=>{ let name=prompt("Nama Trainer"); if(name) gymData.trainers.push({id:Date.now(), name, specialization:prompt("Spesialisasi"), schedule:prompt("Jadwal"), phone:"-", rating:0, reviews:[]}); saveData(); renderApp(); });
-        document.getElementById("addClassBtn")?.addEventListener("click",()=>{ let name=prompt("Nama Kelas"); if(name) gymData.classes.push({id:Date.now(), name, trainerId:1, day:prompt("Hari"), time:prompt("Jam"), capacity:15, booked:[], waitingList:[]}); saveData(); renderApp(); });
-        document.getElementById("addGalleryBtn")?.addEventListener("click",()=>{ let url=document.getElementById("newGalleryUrl")?.value; if(url){ gymData.gallery.push(url); saveData(); renderApp(); } });
-        document.querySelectorAll(".delGallery").forEach(btn=>btn.addEventListener("click",(e)=>{ let url=btn.dataset.url; gymData.gallery=gymData.gallery.filter(g=>g!==url); saveData(); renderApp(); }));
-        document.querySelectorAll(".delTrainer").forEach(btn=>btn.addEventListener("click",(e)=>{ let id=parseInt(btn.dataset.id); gymData.trainers=gymData.trainers.filter(t=>t.id!==id); saveData(); renderApp(); }));
-        renderReportChart();
+
+    function renderMemberList() {
+        let members = gymData.users.filter(u => u.role === "member");
+        return `<table><thead><tr><th>Nama</th><th>Email</th><th>Membership</th><th>Expired</th><th>Status</th><th>Aksi</th></tr></thead><tbody>
+            ${members.map(m => `<tr>
+                <td>${m.name}</td><td>${m.email}</td><td>${m.membership || '-'}</td><td>${m.expireDate || '-'}</td>
+                <td><span class="badge">${m.status}</span></td>
+                <td><button class="btn-outline resetPassBtn" data-id="${m.id}" style="padding:4px 10px;">Reset Pass</button></td>
+            </tr>`).join('')}
+        </tbody></table><button id="addMemberBtn" class="btn-primary" style="margin-top:16px;">+ Tambah Member Baru</button>`;
     }
-    function renderAdminCharts(){
-        let ctxRev = document.getElementById("revenueChart")?.getContext("2d");
-        if(ctxRev){ let monthly=[0,0,0,0,0,0]; gymData.payments.forEach(p=>{ let m=new Date(p.date).getMonth(); monthly[m]+=p.amount; }); new Chart(ctxRev, {type:'bar', data:{labels:['Jan','Feb','Mar','Apr','Mei','Jun'], datasets:[{label:'Pendapatan', data:monthly, backgroundColor:'#facc15'}]}}); }
-        let ctxMem = document.getElementById("memberChart")?.getContext("2d");
-        if(ctxMem){ let memCount = gymData.users.filter(u=>u.role==="member").length; new Chart(ctxMem, {type:'doughnut', data:{labels:['Member Aktif','Tidak Aktif'], datasets:[{data:[memCount, 0], backgroundColor:['#22c55e','#6b7280']}]}}); }
+    function renderTrainerManagement() {
+        return `<div><button id="addTrainerBtn" class="btn-primary">+ Tambah Pelatih</button><br><br>
+                <table><thead><tr><th>Nama</th><th>Keahlian</th><th>Jadwal</th><th>Telepon</th><th>Aksi</th></tr></thead><tbody>
+                ${gymData.trainers.map(t => `<tr><td>${t.name}</td><td>${t.expertise}</td><td>${t.schedule}</td><td>${t.phone}</td>
+                <td><button class="btn-outline delTrainer" data-id="${t.id}">Hapus</button></td></tr>`).join('')}
+                </tbody></table></div>`;
     }
-    function renderReportChart(){
-        let ctx = document.getElementById("reportChart")?.getContext("2d");
-        if(ctx){ let categories = ["Harian","Mingguan","Bulanan","Tahunan"]; let sales = [0,0,0,0]; gymData.payments.forEach(p=>{ let idx = ["harian","mingguan","bulanan","tahunan"].indexOf(p.packageId); if(idx!==-1) sales[idx]++; }); new Chart(ctx, {type:'bar', data:{labels:categories, datasets:[{label:'Jumlah Pembelian', data:sales}]}}); }
+    function renderScheduleManagement() {
+        return `<div><button id="addScheduleBtn" class="btn-primary">+ Tambah Jadwal</button><br><br>
+                <table><thead><tr><th>Hari</th><th>Jam</th><th>Kelas</th><th>Pelatih</th><th>Aksi</th></tr></thead><tbody>
+                ${gymData.jadwalLatihan.map(s => `<tr><td>${s.day}</td><td>${s.time}</td><td>${s.class}</td><td>${s.trainer}</td>
+                <td><button class="btn-outline delSchedule" data-id="${s.id}">Hapus</button></td></tr>`).join('')}
+                </tbody></table></div>`;
+    }
+    function renderAttendanceReport() {
+        let attendances = gymData.attendances.map(att => {
+            let user = gymData.users.find(u => u.id === att.userId);
+            return `<tr><td>${user?.name || 'unknown'}</td><td>${att.date}</td><td>${att.checkinTime}</td></tr>`;
+        }).join('');
+        return `<h4>Riwayat Absensi Member</h4><table><thead><tr><th>Member</th><th>Tanggal</th><th>Jam Check-in</th></tr></thead><tbody>${attendances || '<tr><td colspan="3">Belum ada data</td></tr>'}</tbody></table>`;
+    }
+    function renderPaymentReport() {
+        let payments = gymData.payments.map(p => {
+            let user = gymData.users.find(u => u.id === p.userId);
+            return `<tr><td>${user?.name || 'User'}</td><td>${p.date}</td><td>${p.packageId}</td><td>Rp ${p.amount.toLocaleString()}</td><td>${p.status}</td></tr>`;
+        }).join('');
+        return `<h4>Riwayat Pembayaran Membership</h4><table><thead><tr><th>Member</th><th>Tgl Bayar</th><th>Paket</th><th>Nominal</th><th>Status</th></tr></thead><tbody>${payments || '<tr><td colspan="5">Belum ada</td></tr>'}</tbody></table>`;
     }
 
-    // ======================= CHAT WIDGET =======================
-    function initChatWidget(){
-        let widget = document.getElementById("chatWidget");
-        if(!currentUser) { if(widget) widget.style.display = "none"; return; }
-        widget.style.display = "flex";
-        let body = document.getElementById("chatBody");
-        if(body) body.innerHTML = gymData.chatMessages.map(m=>`<div><b>${m.sender}:</b> ${m.message}</div>`).join('');
-        document.getElementById("sendChatBtn")?.addEventListener("click", ()=>{
-            let msg = document.getElementById("chatMessage").value;
-            if(msg){
-                gymData.chatMessages.push({sender:currentUser.name, message:msg, timestamp:new Date(), role:currentUser.role});
-                saveData();
-                initChatWidget();
-                document.getElementById("chatMessage").value = "";
+    function attachSubEvents() {
+        document.getElementById("addMemberBtn")?.addEventListener("click", () => showRegisterModal());
+        document.getElementById("addTrainerBtn")?.addEventListener("click", () => {
+            let name = prompt("Nama Pelatih");
+            let expertise = prompt("Keahlian");
+            let schedule = prompt("Jadwal mengajar");
+            let phone = prompt("No Telepon");
+            if(name) {
+                gymData.trainers.push({ id: Date.now(), name, expertise, schedule, phone });
+                saveToLocal();
+                renderApp();
             }
         });
-        document.getElementById("chatHeader")?.addEventListener("click", ()=>{
-            let b = document.querySelector(".chat-body");
-            if(b) b.style.display = b.style.display === "none" ? "flex" : "none";
+        document.querySelectorAll(".delTrainer").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let id = parseInt(btn.dataset.id);
+                gymData.trainers = gymData.trainers.filter(t => t.id !== id);
+                saveToLocal();
+                renderApp();
+            });
+        });
+        document.getElementById("addScheduleBtn")?.addEventListener("click", () => {
+            let day = prompt("Hari (Senin, Selasa...)");
+            let time = prompt("Jam (contoh: 08:00 - 10:00)");
+            let className = prompt("Nama Kelas");
+            let trainer = prompt("Nama Pelatih");
+            if(day) {
+                gymData.jadwalLatihan.push({ id: Date.now(), day, time, class: className, trainer });
+                saveToLocal();
+                renderApp();
+            }
+        });
+        document.querySelectorAll(".delSchedule").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let id = parseInt(btn.dataset.id);
+                gymData.jadwalLatihan = gymData.jadwalLatihan.filter(s => s.id !== id);
+                saveToLocal();
+                renderApp();
+            });
+        });
+        document.querySelectorAll(".resetPassBtn").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+                let uid = parseInt(btn.dataset.id);
+                let user = gymData.users.find(u => u.id === uid);
+                if(user) { user.password = "member123"; saveToLocal(); alert("Password direset menjadi member123"); renderApp(); }
+            });
         });
     }
 
-    document.getElementById("darkModeToggle")?.addEventListener("click", ()=>{ darkMode=!darkMode; localStorage.setItem("darkMode", darkMode); renderApp(); });
+    function renderMembershipChart() {
+        const ctx = document.getElementById("membershipChart")?.getContext("2d");
+        if(!ctx) return;
+        const members = gymData.users.filter(u => u.role === "member");
+        const membershipCount = { bulanan:0, "3bulan":0, tahunan:0, none:0 };
+        members.forEach(m => {
+            if(m.membership === "bulanan") membershipCount.bulanan++;
+            else if(m.membership === "3bulan") membershipCount["3bulan"]++;
+            else if(m.membership === "tahunan") membershipCount.tahunan++;
+            else membershipCount.none++;
+        });
+        new Chart(ctx, { type: 'doughnut', data: { labels: ['Bulanan','3 Bulan','Tahunan','Tidak Aktif'], datasets: [{ data: [membershipCount.bulanan, membershipCount["3bulan"], membershipCount.tahunan, membershipCount.none], backgroundColor: ['#22c55e','#eab308','#3b82f6','#6b7280'] }] } });
+    }
+    function renderRevenueChart() {
+        const ctx = document.getElementById("revenueChart")?.getContext("2d");
+        if(!ctx) return;
+        const monthly = [0,0,0,0,0,0];
+        gymData.payments.forEach(p => {
+            let month = new Date(p.date).getMonth();
+            monthly[month] += p.amount;
+        });
+        new Chart(ctx, { type: 'bar', data: { labels: ['Jan','Feb','Mar','Apr','Mei','Jun'], datasets: [{ label: 'Pendapatan (Rp)', data: monthly, backgroundColor: '#22c55e' }] } });
+    }
+
+    // MEMBER DASHBOARD
+    function renderMemberDashboard() {
+        const member = gymData.users.find(u => u.id === currentUser.id);
+        const myPayments = gymData.payments.filter(p => p.userId === currentUser.id);
+        const myAttendances = gymData.attendances.filter(a => a.userId === currentUser.id);
+        const activePackages = gymData.membershipPackages;
+        return `
+            <div class="card"><h3>👋 Halo, ${member.name}</h3>
+                <p>Status Membership: ${member.membership ? member.membership : 'Belum aktif'} | Expired: ${member.expireDate || '-'}</p>
+                <button id="extendMembershipBtn" class="btn-primary">Perpanjang / Beli Membership</button>
+            </div>
+            <div class="grid-2">
+                <div class="card"><h3><i class="fas fa-calendar-alt"></i> Jadwal Latihan</h3>
+                    <table><thead><tr><th>Hari</th><th>Jam</th><th>Kelas</th><th>Pelatih</th></tr></thead><tbody>
+                    ${gymData.jadwalLatihan.map(j => `<tr><td>${j.day}</td><td>${j.time}</td><td>${j.class}</td><td>${j.trainer}</td></tr>`).join('')}
+                    </tbody></table>
+                </div>
+                <div class="card"><h3><i class="fas fa-chalkboard-user"></i> Data Pelatih</h3>
+                    <table><thead><tr><th>Nama</th><th>Keahlian</th><th>Jadwal</th></tr></thead><tbody>
+                    ${gymData.trainers.map(t => `<tr><td>${t.name}</td><td>${t.expertise}</td><td>${t.schedule}</td></tr>`).join('')}
+                    </tbody></table>
+                </div>
+                <div class="card"><h3><i class="fas fa-fingerprint"></i> Absensi Hari Ini</h3>
+                    <button id="checkinBtn" class="btn-primary"><i class="fas fa-check-circle"></i> Check-in Sekarang</button>
+                    <p style="margin-top:8px;">Riwayat absensi terakhir: ${myAttendances.slice(-1)[0]?.date || 'Belum pernah absen'}</p>
+                </div>
+                <div class="card"><h3><i class="fas fa-history"></i> Riwayat Pembayaran</h3>
+                    <table><thead><tr><th>Tgl</th><th>Paket</th><th>Jumlah</th><th>Status</th></tr></thead><tbody>
+                    ${myPayments.map(p => `<tr><td>${p.date}</td><td>${p.packageId}</td><td>Rp ${p.amount.toLocaleString()}</td><td>${p.status}</td></tr>`).join('') || '<tr><td colspan="4">Belum ada pembayaran</td></tr>'}
+                    </tbody></table>
+                </div>
+            </div>
+            <div id="paymentModal" style="display:none;" class="card"><!-- tempat modal sederhana --></div>
+        `;
+    }
+    function attachMemberEvents() {
+        document.getElementById("checkinBtn")?.addEventListener("click", () => {
+            const today = new Date().toISOString().slice(0,10);
+            const already = gymData.attendances.find(a => a.userId === currentUser.id && a.date === today);
+            if(already) { alert("Anda sudah melakukan absensi hari ini!"); return; }
+            const newId = gymData.attendances.length + 1;
+            gymData.attendances.push({ id: newId, userId: currentUser.id, date: today, checkinTime: new Date().toLocaleTimeString('id-ID') });
+            saveToLocal();
+            alert(`Absensi berhasil pada ${today} ${new Date().toLocaleTimeString()}`);
+            renderApp();
+        });
+        document.getElementById("extendMembershipBtn")?.addEventListener("click", () => {
+            let modalHtml = `<div class="card"><h3>Pilih Paket Membership</h3>`;
+            gymData.membershipPackages.forEach(pkg => {
+                modalHtml += `<button class="btn-outline buyPkgBtn" data-pkg="${pkg.id}" data-price="${pkg.price}" style="margin:5px;">${pkg.name} - Rp ${pkg.price.toLocaleString()}</button>`;
+            });
+            modalHtml += `<button id="closeModalBtn" class="btn-outline">Batal</button></div>`;
+            const modalDiv = document.getElementById("paymentModal");
+            modalDiv.style.display = "block";
+            modalDiv.innerHTML = modalHtml;
+            document.querySelectorAll(".buyPkgBtn").forEach(btn => {
+                btn.addEventListener("click", (e) => {
+                    let pkgId = btn.dataset.pkg;
+                    let price = parseInt(btn.dataset.price);
+                    let pkg = gymData.membershipPackages.find(p => p.id === pkgId);
+                    if(confirm(`Konfirmasi pembelian paket ${pkg.name} sebesar Rp ${price.toLocaleString()}? (Simulasi pembayaran)`)) {
+                        // simpan pembayaran
+                        gymData.payments.push({ id: Date.now(), userId: currentUser.id, amount: price, packageId: pkgId, date: new Date().toISOString().slice(0,10), status: "lunas" });
+                        // update membership member
+                        let member = gymData.users.find(u => u.id === currentUser.id);
+                        member.membership = pkgId;
+                        let expire = new Date();
+                        expire.setDate(expire.getDate() + pkg.durationDays);
+                        member.expireDate = expire.toISOString().slice(0,10);
+                        saveToLocal();
+                        alert("Pembayaran sukses! Membership Anda telah aktif.");
+                        modalDiv.style.display = "none";
+                        renderApp();
+                    }
+                });
+            });
+            document.getElementById("closeModalBtn")?.addEventListener("click", () => modalDiv.style.display = "none");
+        });
+    }
+
+    // Modal Login/Register
+    function showLoginModal() {
+        let modal = document.createElement("div");
+        modal.className = "card";
+        modal.style.position = "fixed"; modal.style.top="20%"; modal.style.left="50%"; modal.style.transform="translateX(-50%)"; modal.style.width="90%"; modal.style.maxWidth="400px"; modal.style.zIndex="1000";
+        modal.innerHTML = `<h3>Login</h3><input id="loginUser" placeholder="Username"><input id="loginPass" placeholder="Password" type="password"><br><br>
+        <button id="doLoginBtn" class="btn-primary">Masuk</button><button id="closeModal" class="btn-outline">Batal</button>`;
+        document.body.appendChild(modal);
+        document.getElementById("doLoginBtn")?.addEventListener("click", () => {
+            const uname = document.getElementById("loginUser").value;
+            const pwd = document.getElementById("loginPass").value;
+            if(login(uname, pwd)) { modal.remove(); renderApp(); }
+            else { alert("Login gagal!"); }
+        });
+        document.getElementById("closeModal")?.addEventListener("click", () => modal.remove());
+    }
+    function showRegisterModal() {
+        let modal = document.createElement("div");
+        modal.className = "card";
+        modal.style.position = "fixed"; modal.style.top="15%"; modal.style.left="50%"; modal.style.transform="translateX(-50%)"; modal.style.width="90%"; modal.style.maxWidth="450px"; modal.style.zIndex="1000";
+        modal.innerHTML = `<h3>Pendaftaran Member Baru</h3>
+        <input id="regName" placeholder="Nama Lengkap"><input id="regUser" placeholder="Username"><input id="regPass" placeholder="Password"><input id="regEmail" placeholder="Email"><input id="regPhone" placeholder="Telepon">
+        <button id="doRegBtn" class="btn-primary">Daftar</button><button id="closeRegModal" class="btn-outline">Tutup</button>`;
+        document.body.appendChild(modal);
+        document.getElementById("doRegBtn")?.addEventListener("click", () => {
+            let name = document.getElementById("regName").value;
+            let user = document.getElementById("regUser").value;
+            let pass = document.getElementById("regPass").value;
+            let email = document.getElementById("regEmail").value;
+            let phone = document.getElementById("regPhone").value;
+            if(!name||!user||!pass) { alert("Lengkapi data"); return; }
+            if(registerMember(user, pass, name, email, phone)) {
+                alert("Pendaftaran berhasil! Silakan login.");
+                modal.remove();
+            } else { alert("Username sudah ada."); }
+        });
+        document.getElementById("closeRegModal")?.addEventListener("click", () => modal.remove());
+    }
+
+    loadFromLocal();
     renderApp();
 </script>
 </body>
 </html>
-```
-
-**Perbaikan utama:**
-- Fungsi `showModal` sekarang menerima callback `onConfirmCallback` dengan benar.
-- Modal login dan register dibuat ulang menggunakan `createElement` dan `showModal` agar event listener bekerja dengan baik.
-- `registerMember` dan `login` menggunakan data `gymData` yang sudah di-load dari localStorage.
-- Semua tombol dan event listener di-refresh setelah render ulang.
-
-**Fitur tetap lengkap:**  
-Login Admin (admin/admin123), Login Member (member1/member123), pendaftaran member baru, manajemen paket, booking kelas, QR check-in, pembayaran online (QRIS/transfer/e-wallet/kartu), invoice PDF, dark mode, chat dengan admin, rating trainer, galeri, promo, dll.
