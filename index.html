@@ -4,10 +4,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>GymFit Pro - Sistem Manajemen Gym</title>
+    <title>GymFit Pro - Sistem Manajemen Gym & Fitness</title>
     <!-- Font Awesome & Google Fonts -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700;800&display=swap" rel="stylesheet">
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <style>
@@ -93,6 +93,7 @@
         .register-link a {
             color: #f97316;
             text-decoration: none;
+            cursor: pointer;
         }
 
         /* Main App (setelah login) */
@@ -181,6 +182,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            flex-wrap: wrap;
         }
         table {
             width: 100%;
@@ -251,10 +253,32 @@
             padding: 4px 10px;
             border-radius: 30px;
             font-size: 12px;
+            display: inline-block;
         }
         .badge-pending {
             background: #eab308;
             color: black;
+            padding: 4px 10px;
+            border-radius: 30px;
+            font-size: 12px;
+            display: inline-block;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #1e293b;
+            border-radius: 32px;
+            padding: 30px;
+            max-width: 450px;
+            width: 90%;
         }
     </style>
 </head>
@@ -266,7 +290,7 @@
         <p>Login Admin / Member</p>
         <div class="input-group">
             <label>Username</label>
-            <input type="text" id="loginUsername" placeholder="admin / username member">
+            <input type="text" id="loginUsername" placeholder="admin / ahmad">
         </div>
         <div class="input-group">
             <label>Password</label>
@@ -280,20 +304,27 @@
             </select>
         </div>
         <button class="btn-login" id="doLoginBtn"><i class="fas fa-sign-in-alt"></i> Masuk</button>
-        <div class="register-link">Belum punya akun member? <a href="#" id="showRegister">Daftar Sekarang</a></div>
+        <div class="register-link">Belum punya akun member? <a id="showRegisterBtn">Daftar Sekarang</a></div>
+        <div class="register-link" style="font-size:12px; margin-top:10px;">Demo: admin/admin123 | ahmad/123</div>
     </div>
 </div>
 
-<!-- REGISTER MODAL (simple) -->
-<div id="registerModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.7); justify-content:center; align-items:center; z-index:1000;">
-    <div class="login-card" style="max-width:400px;">
-        <h3>Pendaftaran Member Baru</h3>
+<!-- MODAL REGISTRASI -->
+<div id="registerModal" class="modal">
+    <div class="modal-content">
+        <h3><i class="fas fa-user-plus"></i> Pendaftaran Member</h3>
         <div class="input-group"><input type="text" id="regName" placeholder="Nama Lengkap"></div>
         <div class="input-group"><input type="text" id="regUsername" placeholder="Username"></div>
         <div class="input-group"><input type="password" id="regPassword" placeholder="Password"></div>
         <div class="input-group"><input type="email" id="regEmail" placeholder="Email"></div>
-        <div class="input-group"><select id="regPackage"><option value="">Pilih Paket Membership</option><option value="Basic">Basic - Rp150.000/bln</option><option value="Gold">Gold - Rp300.000/bln</option><option value="Platinum">Platinum - Rp500.000/bln</option></select></div>
-        <button id="doRegisterBtn" class="btn-login">Daftar Member</button>
+        <div class="input-group">
+            <select id="regPackage">
+                <option value="Basic">Basic - Rp150.000/bln</option>
+                <option value="Gold">Gold - Rp300.000/bln</option>
+                <option value="Platinum">Platinum - Rp500.000/bln</option>
+            </select>
+        </div>
+        <button id="doRegisterBtn" class="btn-login">Daftar</button>
         <button id="closeRegisterBtn" class="btn-login" style="background:#475569; margin-top:8px;">Batal</button>
     </div>
 </div>
@@ -310,29 +341,34 @@
     <div class="main-content">
         <div class="top-bar">
             <div><i class="fas fa-bars" id="menuToggle" style="cursor:pointer;"></i> <span id="pageTitle">Dashboard</span></div>
-            <div class="user-info"><span id="userDisplay">Admin</span> <div class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Keluar</div></div>
+            <div class="user-info"><span id="userDisplay"></span> <div class="logout-btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Keluar</div></div>
         </div>
         <div id="contentArea"></div>
     </div>
 </div>
 
 <script>
-    // ---------- STORAGE KEYS ----------
+    // ---------- INITIAL DATA ----------
     let gymData = {
-        members: [],     // { id, name, username, password, email, package, statusPayment (pending/active), joinDate }
-        trainers: [],    // { id, name, expertise, phone }
-        schedules: [],   // { id, day, time, trainerName, className }
-        payments: [],    // { id, memberId, amount, package, status, date }
-        attendances: []  // { id, memberId, date, checkinTime }
+        members: [],
+        trainers: [],
+        schedules: [],
+        payments: [],
+        attendances: []
     };
 
-    // Load initial data
+    function generateId(arr) { return arr.length ? Math.max(...arr.map(i=>i.id)) + 1 : 1; }
+
+    function saveData() {
+        localStorage.setItem('gymfit_data', JSON.stringify(gymData));
+    }
+
     function loadData() {
         const stored = localStorage.getItem('gymfit_data');
         if(stored) {
             gymData = JSON.parse(stored);
         } else {
-            // Default data
+            // Data default
             gymData.members = [
                 { id: 1, name: "Ahmad Fitness", username: "ahmad", password: "123", email: "ahmad@mail.com", package: "Gold", statusPayment: "active", joinDate: "2025-01-10" },
                 { id: 2, name: "Siti Sehat", username: "siti", password: "123", email: "siti@mail.com", package: "Basic", statusPayment: "pending", joinDate: "2025-02-01" }
@@ -357,21 +393,13 @@
             saveData();
         }
     }
-    function saveData() {
-        localStorage.setItem('gymfit_data', JSON.stringify(gymData));
-    }
 
-    // Global state
-    let currentUser = null;   // { role, id, username, name, ... }
+    let currentUser = null;  // { role, id, username, name }
     let currentNav = 'dashboard';
 
-    // Helper functions
-    function generateId(arr) { return arr.length ? Math.max(...arr.map(i=>i.id)) + 1 : 1; }
-
-    // Render UI sesuai role
+    // RENDER APP
     function renderApp() {
         if(!currentUser) return;
-        // Build sidebar menu
         const navMenu = document.getElementById('navMenu');
         let menuItems = [];
         if(currentUser.role === 'admin') {
@@ -397,18 +425,17 @@
         document.querySelectorAll('.nav-item').forEach(el => {
             el.addEventListener('click', () => {
                 currentNav = el.dataset.nav;
-                renderApp(); // re-render konten
+                renderApp();
             });
         });
-        // Render konten utama
         const content = document.getElementById('contentArea');
         if(currentUser.role === 'admin') renderAdminContent(content);
         else renderMemberContent(content);
-        document.getElementById('userDisplay').innerText = currentUser.name || currentUser.username;
+        document.getElementById('userDisplay').innerHTML = `<i class="fas fa-user-circle"></i> ${currentUser.name || currentUser.username}`;
         document.getElementById('pageTitle').innerText = menuItems.find(i=>i.id===currentNav)?.label || 'Dashboard';
     }
 
-    // ADMIN RENDER
+    // ==================== ADMIN RENDER ====================
     function renderAdminContent(container) {
         if(currentNav === 'dashboard') renderAdminDashboard(container);
         else if(currentNav === 'members') renderMemberManagement(container);
@@ -436,11 +463,9 @@
             <div class="card"><canvas id="memberChart" width="400" height="200"></canvas></div>
             <div class="card"><h4>Statistik Kehadiran per Bulan</h4><canvas id="attendanceChart"></canvas></div>
         `;
-        // Chart member by paket
         const packages = ['Basic','Gold','Platinum'];
         const counts = packages.map(p => gymData.members.filter(m => m.package === p).length);
         new Chart(document.getElementById('memberChart'), { type: 'bar', data: { labels: packages, datasets: [{ label: 'Jumlah Member', data: counts, backgroundColor: '#f97316' }] } });
-        // Attendance per bulan (6 bulan terakhir)
         const months = [];
         const attendCounts = [];
         for(let i=5;i>=0;i--) {
@@ -453,16 +478,16 @@
     }
 
     function renderMemberManagement(container) {
-        container.innerHTML = `<div class="card"><div class="card-header">Data Member <button id="addMemberBtn">+ Tambah Member</button></div><table><tr><th>Nama</th><th>Username</th><th>Paket</th><th>Status</th><th>Aksi</th></tr>${
-            gymData.members.map(m => `<tr><td>${m.name}</td><td>${m.username}</td><td>${m.package}</td><td><span class="badge-${m.statusPayment === 'active' ? 'success' : 'pending'}">${m.statusPayment}</span></td><td><button class="editMember" data-id="${m.id}">Edit Status</button></td></tr>`).join('')
-        }</table></div>`;
-        document.getElementById('addMemberBtn')?.addEventListener('click', () => alert("Fitur tambah member dapat diintegrasi dengan pendaftaran."));
+        container.innerHTML = `<div class="card"><div class="card-header">Data Member <button id="addMemberBtn">+ Tambah Member</button></div><table>
+            <thead><tr><th>Nama</th><th>Username</th><th>Paket</th><th>Status</th><th>Aksi</th></tr></thead>
+            <tbody>${gymData.members.map(m => `<tr><td>${m.name}</td><td>${m.username}</td><td>${m.package}</td><td><span class="badge-${m.statusPayment === 'active' ? 'success' : 'pending'}">${m.statusPayment}</span></td><td><button class="editMember" data-id="${m.id}">Ubah Status</button></td></tr>`).join('')}</tbody>
+        </table></div>`;
+        document.getElementById('addMemberBtn')?.addEventListener('click', () => alert("Silakan member daftar via halaman registrasi."));
         document.querySelectorAll('.editMember').forEach(btn => {
             btn.addEventListener('click', () => {
                 let id = parseInt(btn.dataset.id);
                 let member = gymData.members.find(m=>m.id===id);
-                let newStatus = member.statusPayment === 'active' ? 'pending' : 'active';
-                member.statusPayment = newStatus;
+                member.statusPayment = member.statusPayment === 'active' ? 'pending' : 'active';
                 saveData();
                 renderMemberManagement(container);
             });
@@ -470,9 +495,10 @@
     }
 
     function renderTrainerManagement(container) {
-        container.innerHTML = `<div class="card"><div class="card-header">Data Pelatih <button id="newTrainerBtn">Tambah Pelatih</button></div><table><tr><th>Nama</th><th>Keahlian</th><th>Telepon</th><th>Aksi</th></tr>${
-            gymData.trainers.map(t => `<tr><td>${t.name}</td><td>${t.expertise}</td><td>${t.phone}</td><td><button class="delTrainer" data-id="${t.id}">Hapus</button></td></tr>`).join('')
-        }</table></div>`;
+        container.innerHTML = `<div class="card"><div class="card-header">Data Pelatih <button id="newTrainerBtn">Tambah Pelatih</button></div>表
+            <thead><tr><th>Nama</th><th>Keahlian</th><th>Telepon</th><th>Aksi</th></tr></thead>
+            <tbody>${gymData.trainers.map(t => `<tr><td>${t.name}</td><td>${t.expertise}</td><td>${t.phone}</td><td><button class="delTrainer" data-id="${t.id}">Hapus</button></td></tr>`).join('')}</tbody>
+        </table></div>`;
         document.getElementById('newTrainerBtn')?.addEventListener('click', () => {
             let name = prompt("Nama pelatih");
             let expertise = prompt("Keahlian");
@@ -494,17 +520,20 @@
     }
 
     function renderScheduleManagement(container) {
-        container.innerHTML = `<div class="card"><div class="card-header">Jadwal Latihan <button id="addScheduleBtn">+ Jadwal</button></div><table><tr><th>Hari</th><th>Jam</th><th>Kelas</th><th>Pelatih</th><th>Aksi</th></tr>${
-            gymData.schedules.map(s => `<tr><td>${s.day}</td><td>${s.time}</td><td>${s.className}</td><td>${s.trainerName}</td><td><button class="delSchedule" data-id="${s.id}">Hapus</button></td></tr>`).join('')
-        }</table></div>`;
+        container.innerHTML = `<div class="card"><div class="card-header">Jadwal Latihan <button id="addScheduleBtn">+ Jadwal</button></div>表
+            <thead><tr><th>Hari</th><th>Jam</th><th>Kelas</th><th>Pelatih</th><th>Aksi</th></tr></thead>
+            <tbody>${gymData.schedules.map(s => `<tr><td>${s.day}</td><td>${s.time}</td><td>${s.className}</td><td>${s.trainerName}</td><td><button class="delSchedule" data-id="${s.id}">Hapus</button></td></tr>`).join('')}</tbody>
+        </table></div>`;
         document.getElementById('addScheduleBtn')?.addEventListener('click', () => {
             let day = prompt("Hari (Senin/Minggu)");
             let time = prompt("Jam (cth: 08:00 - 09:30)");
             let className = prompt("Nama Kelas");
             let trainerName = prompt("Nama Pelatih");
-            if(day && time) gymData.schedules.push({ id: generateId(gymData.schedules), day, time, className, trainerName });
-            saveData();
-            renderScheduleManagement(container);
+            if(day && time) {
+                gymData.schedules.push({ id: generateId(gymData.schedules), day, time, className, trainerName });
+                saveData();
+                renderScheduleManagement(container);
+            }
         });
         document.querySelectorAll('.delSchedule').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -517,20 +546,22 @@
 
     function renderPackageManagement(container) {
         const packages = [{ name: 'Basic', price: 150000 }, { name: 'Gold', price: 300000 }, { name: 'Platinum', price: 500000 }];
-        container.innerHTML = `<div class="card"><div class="card-header">Paket Membership</div><table><tr><th>Paket</th><th>Harga/Bulan</th><th>Fitur</th></tr>${
-            packages.map(p => `<tr><td>${p.name}</td><td>Rp ${p.price.toLocaleString()}</td><td>${p.name==='Basic'?'Akses dasar':'Akses penuh + trainer'}</td></tr>`).join('')
-        }</table><button id="updatePriceBtn" class="secondary">Update Harga (Demo)</button></div>`;
-        document.getElementById('updatePriceBtn')?.addEventListener('click', () => alert("Harga paket dapat diatur di backend."));
+        container.innerHTML = `<div class="card"><div class="card-header">Paket Membership</div>表
+            <thead><tr><th>Paket</th><th>Harga/Bulan</th><th>Fitur</th></tr></thead>
+            <tbody>${packages.map(p => `<tr><td>${p.name}</td><td>Rp ${p.price.toLocaleString()}</td><td>${p.name==='Basic'?'Akses dasar':'Akses penuh + trainer'}</td></tr>`).join('')}</tbody>
+        </table><button id="updatePriceBtn" class="secondary">Update Harga (Demo)</button></div>`;
+        document.getElementById('updatePriceBtn')?.addEventListener('click', () => alert("Fitur update harga dapat dikembangkan lebih lanjut."));
     }
 
     function renderPaymentVerification(container) {
         let pending = gymData.payments.filter(p => p.status === 'pending');
-        container.innerHTML = `<div class="card"><div class="card-header">Konfirmasi Pembayaran</div><table><tr><th>Member</th><th>Paket</th><th>Jumlah</th><th>Tanggal</th><th>Aksi</th></tr>${
-            pending.map(p => {
+        container.innerHTML = `<div class="card"><div class="card-header">Konfirmasi Pembayaran</div>表
+            <thead><tr><th>Member</th><th>Paket</th><th>Jumlah</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+            <tbody>${pending.map(p => {
                 let member = gymData.members.find(m=>m.id===p.memberId);
                 return `<tr><td>${member?.name || '-'}</td><td>${p.package}</td><td>Rp ${p.amount.toLocaleString()}</td><td>${p.date}</td><td><button class="confirmPay" data-id="${p.id}">Konfirmasi</button></td></tr>`;
-            }).join('')
-        }</table></div>`;
+            }).join('')}</tbody>
+        </table></div>`;
         document.querySelectorAll('.confirmPay').forEach(btn => {
             btn.addEventListener('click', () => {
                 let payId = parseInt(btn.dataset.id);
@@ -551,17 +582,20 @@
             let member = gymData.members.find(m=>m.id===a.memberId);
             return `<tr><td>${member?.name || '-'}</td><td>${a.date}</td><td>${a.checkinTime}</td></tr>`;
         }).join('');
-        container.innerHTML = `<div class="card"><div class="card-header">Riwayat Absensi Member</div><table><tr><th>Member</th><th>Tanggal</th><th>Jam Check-in</th></tr>${records || '<tr><td colspan="3">Belum ada absensi</td></tr>'}</table></div>`;
+        container.innerHTML = `<div class="card"><div class="card-header">Riwayat Absensi Member</div>表
+            <thead><tr><th>Member</th><th>Tanggal</th><th>Jam Check-in</th></tr></thead>
+            <tbody>${records || '<tr><td colspan="3">Belum ada absensi</td></tr>'}</tbody>
+        </table></div>`;
     }
 
     function renderReports(container) {
         let active = gymData.members.filter(m=>m.statusPayment==='active').length;
         let income = gymData.payments.filter(p=>p.status==='confirmed').reduce((a,b)=>a+b.amount,0);
         container.innerHTML = `<div class="card"><h3>Laporan Keanggotaan</h3><p>Total Member Terdaftar: ${gymData.members.length}</p><p>Member Aktif: ${active}</p><p>Total Pendapatan Terkonfirmasi: Rp ${income.toLocaleString()}</p><p>Total Kehadiran Seluruh Waktu: ${gymData.attendances.length}</p><button id="exportReportBtn">Export Laporan (Simulasi)</button></div>`;
-        document.getElementById('exportReportBtn')?.addEventListener('click', () => alert("Fitur export laporan akan menghasilkan file CSV."));
+        document.getElementById('exportReportBtn')?.addEventListener('click', () => alert("Fitur export laporan siap digunakan."));
     }
 
-    // MEMBER RENDER
+    // ==================== MEMBER RENDER ====================
     function renderMemberContent(container) {
         if(currentNav === 'dashboard') renderMemberDashboard(container);
         else if(currentNav === 'mySchedule') renderMemberSchedule(container);
@@ -572,16 +606,17 @@
     function renderMemberDashboard(container) {
         const member = gymData.members.find(m=>m.id === currentUser.id);
         let attendanceCount = gymData.attendances.filter(a=>a.memberId===currentUser.id).length;
-        container.innerHTML = `<div class="card"><h3>Selamat Datang, ${member?.name}</h3><p>Paket: ${member?.package} | Status: ${member?.statusPayment}</p><p>Total kehadiran Anda: ${attendanceCount} kali</p></div><div class="card"><h4>Pengumuman</h4><p>Jaga kesehatan dan tetap semangat latihan!</p></div>`;
+        container.innerHTML = `<div class="card"><h3>Selamat Datang, ${member?.name}</h3><p>Paket: ${member?.package} | Status: <span class="badge-${member?.statusPayment === 'active' ? 'success' : 'pending'}">${member?.statusPayment}</span></p><p>Total kehadiran Anda: ${attendanceCount} kali</p></div><div class="card"><h4>Pengumuman</h4><p>Jaga kesehatan dan tetap semangat latihan!</p></div>`;
     }
     function renderMemberSchedule(container) {
-        container.innerHTML = `<div class="card"><div class="card-header">Jadwal Latihan Gym</div><table><tr><th>Hari</th><th>Jam</th><th>Kelas</th><th>Pelatih</th></tr>${
-            gymData.schedules.map(s => `<tr><td>${s.day}</td><td>${s.time}</td><td>${s.className}</td><td>${s.trainerName}</td></tr>`).join('')
-        }</table></div>`;
+        container.innerHTML = `<div class="card"><div class="card-header">Jadwal Latihan Gym</div>表
+            <thead><tr><th>Hari</th><th>Jam</th><th>Kelas</th><th>Pelatih</th></tr></thead>
+            <tbody>${gymData.schedules.map(s => `<tr><td>${s.day}</td><td>${s.time}</td><td>${s.className}</td><td>${s.trainerName}</td></tr>`).join('')}</tbody>
+        </table></div>`;
     }
     function renderMemberMembership(container) {
         const member = gymData.members.find(m=>m.id===currentUser.id);
-        container.innerHTML = `<div class="card"><h3>Paket Anda: ${member?.package}</h3><p>Status Pembayaran: ${member?.statusPayment === 'active' ? 'Aktif' : 'Menunggu Verifikasi'}</p><button id="payNowBtn">Lakukan Pembayaran (Simulasi)</button></div>`;
+        container.innerHTML = `<div class="card"><h3>Paket Anda: ${member?.package}</h3><p>Status Pembayaran: <span class="badge-${member?.statusPayment === 'active' ? 'success' : 'pending'}">${member?.statusPayment}</span></p><button id="payNowBtn">Lakukan Pembayaran (Simulasi)</button></div>`;
         document.getElementById('payNowBtn')?.addEventListener('click', () => {
             let amount = member.package === 'Basic' ? 150000 : (member.package === 'Gold' ? 300000 : 500000);
             let newPayment = { id: generateId(gymData.payments), memberId: member.id, amount, package: member.package, status: 'pending', date: new Date().toISOString().slice(0,10) };
@@ -593,9 +628,10 @@
         });
     }
     function renderMemberAttendance(container) {
-        container.innerHTML = `<div class="card"><h3>Absensi Hari Ini</h3><button id="checkinBtn">Check-in Sekarang</button><div id="attendanceMsg"></div><h4>Riwayat Absensi Anda</h4><table><tr><th>Tanggal</th><th>Jam</th></tr>${
-            gymData.attendances.filter(a=>a.memberId===currentUser.id).map(a=>`<tr><td>${a.date}</td><td>${a.checkinTime}</td></tr>`).join('')
-        }</table></div>`;
+        container.innerHTML = `<div class="card"><h3>Absensi Hari Ini</h3><button id="checkinBtn">Check-in Sekarang</button><div id="attendanceMsg"></div><h4>Riwayat Absensi Anda</h4>表
+            <thead><tr><th>Tanggal</th><th>Jam</th></tr></thead>
+            <tbody>${gymData.attendances.filter(a=>a.memberId===currentUser.id).map(a=>`<tr><td>${a.date}</td><td>${a.checkinTime}</td></tr>`).join('')}</tbody>
+        </table></div>`;
         document.getElementById('checkinBtn')?.addEventListener('click', () => {
             let today = new Date().toISOString().slice(0,10);
             let already = gymData.attendances.some(a => a.memberId === currentUser.id && a.date === today);
@@ -608,7 +644,7 @@
         });
     }
 
-    // AUTH LOGIC
+    // ==================== AUTHENTICATION ====================
     function login(username, password, role) {
         if(role === 'admin') {
             if(username === 'admin' && password === 'admin123') {
@@ -624,58 +660,84 @@
         }
         return false;
     }
+
     function registerMember(name, username, password, email, pkg) {
-        let exist = gymData.members.find(m=>m.username===username);
-        if(exist) return false;
+        if(gymData.members.some(m => m.username === username)) return false;
+        let newId = generateId(gymData.members);
         let newMember = {
-            id: generateId(gymData.members),
-            name, username, password, email, package: pkg, statusPayment: 'pending', joinDate: new Date().toISOString().slice(0,10)
+            id: newId,
+            name, username, password, email,
+            package: pkg,
+            statusPayment: 'pending',
+            joinDate: new Date().toISOString().slice(0,10)
         };
         gymData.members.push(newMember);
-        // tambahkan payment record pending
         let amount = pkg === 'Basic' ? 150000 : (pkg === 'Gold' ? 300000 : 500000);
-        gymData.payments.push({ id: generateId(gymData.payments), memberId: newMember.id, amount, package: pkg, status: 'pending', date: new Date().toISOString().slice(0,10) });
+        gymData.payments.push({
+            id: generateId(gymData.payments),
+            memberId: newId,
+            amount,
+            package: pkg,
+            status: 'pending',
+            date: new Date().toISOString().slice(0,10)
+        });
         saveData();
         return true;
     }
 
-    // EVENT LISTENER
+    // EVENT LISTENERS
     document.getElementById('doLoginBtn').addEventListener('click', () => {
-        let uname = document.getElementById('loginUsername').value;
-        let pass = document.getElementById('loginPassword').value;
+        let uname = document.getElementById('loginUsername').value.trim();
+        let pass = document.getElementById('loginPassword').value.trim();
         let role = document.getElementById('loginRole').value;
         if(login(uname, pass, role)) {
             document.getElementById('loginPage').style.display = 'none';
             document.getElementById('appContainer').style.display = 'block';
             renderApp();
-        } else alert("Username/password salah! \nAdmin: admin/admin123 \nMember: ahmad/123 atau siti/123");
+        } else {
+            alert("Login gagal! Periksa username/password.\nAdmin: admin/admin123\nMember: ahmad/123");
+        }
     });
-    document.getElementById('showRegister').addEventListener('click', (e) => {
-        e.preventDefault();
+
+    document.getElementById('showRegisterBtn').addEventListener('click', () => {
         document.getElementById('registerModal').style.display = 'flex';
     });
-    document.getElementById('closeRegisterBtn').addEventListener('click', () => document.getElementById('registerModal').style.display = 'none');
-    document.getElementById('doRegisterBtn').addEventListener('click', () => {
-        let name = document.getElementById('regName').value;
-        let uname = document.getElementById('regUsername').value;
-        let pass = document.getElementById('regPassword').value;
-        let email = document.getElementById('regEmail').value;
-        let pkg = document.getElementById('regPackage').value;
-        if(name && uname && pass && email && pkg) {
-            if(registerMember(name, uname, pass, email, pkg)) {
-                alert("Pendaftaran berhasil! Silakan login menggunakan username baru.");
-                document.getElementById('registerModal').style.display = 'none';
-            } else alert("Username sudah terdaftar!");
-        } else alert("Lengkapi semua data!");
+    document.getElementById('closeRegisterBtn').addEventListener('click', () => {
+        document.getElementById('registerModal').style.display = 'none';
     });
+    document.getElementById('doRegisterBtn').addEventListener('click', () => {
+        let name = document.getElementById('regName').value.trim();
+        let uname = document.getElementById('regUsername').value.trim();
+        let pass = document.getElementById('regPassword').value.trim();
+        let email = document.getElementById('regEmail').value.trim();
+        let pkg = document.getElementById('regPackage').value;
+        if(!name || !uname || !pass || !email || !pkg) {
+            alert("Harap isi semua data!");
+            return;
+        }
+        if(registerMember(name, uname, pass, email, pkg)) {
+            alert("Pendaftaran berhasil! Silakan login dengan akun baru Anda.");
+            document.getElementById('registerModal').style.display = 'none';
+            document.getElementById('loginUsername').value = uname;
+            document.getElementById('loginPassword').value = pass;
+            document.getElementById('loginRole').value = 'member';
+        } else {
+            alert("Username sudah terdaftar, gunakan username lain.");
+        }
+    });
+
     document.getElementById('logoutBtn').addEventListener('click', () => {
         currentUser = null;
         document.getElementById('loginPage').style.display = 'flex';
         document.getElementById('appContainer').style.display = 'none';
     });
-    document.getElementById('menuToggle')?.addEventListener('click', () => document.getElementById('sidebar').classList.toggle('open'));
+    document.getElementById('menuToggle')?.addEventListener('click', () => {
+        document.getElementById('sidebar').classList.toggle('open');
+    });
 
+    // INIT
     loadData();
+    // Tampilkan halaman login (sudah tampil default)
 </script>
 </body>
 </html>
